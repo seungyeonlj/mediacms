@@ -13,7 +13,7 @@ console = Console()
 print("Welcome to the CLI Tool of [bold blue]MediaCMS![/bold blue]", ":thumbs_up:")
 
 
-BASE_URL = 'https://demo.mediacms.io/api/v1'
+BASE_URL = 'https://localhost/api/v1'
 AUTH_KEY = ''
 USERNAME = ''
 EMAIL = ''
@@ -50,7 +50,7 @@ def login():
         "password": f"{password}",
     }
 
-    response = requests.post(url=f'{BASE_URL}/login', data=data)
+    response = requests.post(url=f'{BASE_URL}/login', data=data, verify=False)
     if response.status_code == 200:
         username = json.loads(response.text)["username"]
         with open(".env", "w") as file:
@@ -59,7 +59,7 @@ def login():
             file.writelines(f'USERNAME={json.loads(response.text)["username"]}\n')
         print(f"Welcome to MediaCMS [bold blue]{username}[/bold blue]. Your auth creds have been suceesfully stored in the .env file", ":v:")
     else:
-        print(f'Error: {"non_field_errors": ["User not found."]}')
+        print(f'Error: "non_field_errors": "User not found."')
 
 
 @apis.command()
@@ -75,7 +75,7 @@ def upload_media():
             files = {}
             abs = os.path.abspath(f"{path}/{filename}")
             files['media_file'] = open(f'{abs}', 'rb')
-            response = requests.post(url=f'{BASE_URL}/media', headers=headers, files=files)
+            response = requests.post(url=f'{BASE_URL}/media', headers=headers, files=files, verify=False)
             if response.status_code == 201:
                 print(f"[bold blue]{filename}[/bold blue] successfully uploaded!")
             else:
@@ -84,7 +84,7 @@ def upload_media():
     else:
         files = {}
         files['media_file'] = open(f'{os.path.abspath(path)}', 'rb')
-        response = requests.post(url=f'{BASE_URL}/media', headers=headers, files=files)
+        response = requests.post(url=f'{BASE_URL}/media', headers=headers, files=files, verify=False)
         if response.status_code == 201:
             print(f"[bold blue]{filename}[/bold blue] successfully uploaded!")
         else:
@@ -96,7 +96,7 @@ def my_media():
     """List all my media"""
 
     headers = {'authorization': f'Token {AUTH_KEY}'}
-    response = requests.get(url=f'{BASE_URL}/media?author={USERNAME}', headers=headers)
+    response = requests.get(url=f'{BASE_URL}/media?author={USERNAME}', headers=headers, verify=False)
 
     if response.status_code == 200:
         data_json = json.loads(response.text)
@@ -118,7 +118,7 @@ def my_media():
 def whoami():
     """Shows the details of the authorized user"""
     headers = {'authorization': f'Token {AUTH_KEY}'}
-    response = requests.get(url=f'{BASE_URL}/whoami', headers=headers)
+    response = requests.get(url=f'{BASE_URL}/whoami', headers=headers, verify=False)
     for data, value in json.loads(response.text).items():
         print(data, ' : ', value)
 
@@ -126,7 +126,7 @@ def whoami():
 @apis.command()
 def categories():
     """List all categories."""
-    response = requests.get(url=f'{BASE_URL}/categories')
+    response = requests.get(url=f'{BASE_URL}/categories', verify=False)
     if response.status_code == 200:
         data_json = json.loads(response.text)
 
@@ -145,7 +145,7 @@ def categories():
 @apis.command()
 def encodings():
     """List all encoding profiles"""
-    response = requests.get(url=f'{BASE_URL}/encode_profiles/')
+    response = requests.get(url=f'{BASE_URL}/encode_profiles/', verify=False)
     if response.status_code == 200:
         data_json = json.loads(response.text)
 
